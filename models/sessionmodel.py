@@ -21,7 +21,7 @@ class SessionParsModel:
         'Subject': {'type': 'str', 'value': '999'},
         'Condition': {'type': 'str', 'value': 'Quiet'},
         'List Number': {'type': 'str', 'value': '1'},
-        'Presentation Level': {'type': 'float', 'value': 65},
+        'Presentation Level': {'type': 'str', 'value': '65'},
         'sentences_per_list': {'type': 'int', 'value': 10},
         'randomize': {'type': 'int', 'value': 0},
         'Speaker Number': {'type': 'int', 'value': 1},
@@ -32,7 +32,7 @@ class SessionParsModel:
         'slm_cal_value': {'type': 'float', 'value': 65},
         'slm_offset': {'type': 'float', 'value': 95.0},
         'new_raw_lvl': {'type': 'float', 'value': -30},
-        'new_db_lvl': {'type': 'float', 'value': 65},
+        'new_db_lvl': {'type': 'str', 'value': '65'},
         'Calibration File': {'type': 'str', 'value': 'cal_stim.wav'}
     }
 

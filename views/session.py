@@ -8,6 +8,7 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
+from tkinter import messagebox
 from tktooltip import ToolTip
 
 
@@ -190,11 +191,41 @@ class SessionDialog(tk.Toplevel):
             filedialog.askdirectory(title="Sentence File Directory"))
 
 
+    def _chk_lengths(self):
+        """ Validate the number of entered lists and presentations levels.
+            If an invalid number exists, display an error message and return 
+            invalid flag.
+        """
+        lists = self.sessionpars['List Number'].get().split()
+        lists = [int(val) for val in lists]
+
+        levels = self.sessionpars['Presentation Level'].get().split()
+        levels = [float(val) for val in levels]
+
+        if (len(levels) != len(lists)) and (len(levels) != 1):
+            messagebox.showerror(
+                title="Invalid Parameters",
+                message="Invalid number of levels!",
+                detail="Either provide a single level, or an equal number of levels and lists."
+            )
+            return 'invalid'
+        else:
+            return 'valid'
+
+
     def _on_submit(self):
         """ Set new_db_lvl to specified presentation level.
             Send event to controller to write sessionpars data to file
         """
-        self.sessionpars['new_db_lvl'].set(self.sessionpars['Presentation Level'].get())
+        # No longer need to set new_db_lvl here because it will be pulled 
+        # from the list of levels from the listmodel
+        #self.sessionpars['new_db_lvl'].set(self.sessionpars['Presentation Level'].get())
+
+        # Validate number of provided lists/levels
+        list_lvl_num_chk = self._chk_lengths()
+        if list_lvl_num_chk == 'invalid':
+            return
+
         print("\nViews_Session_140: Sending save event to controller...")
         self.parent.event_generate('<<SessionSubmit>>')
         self.destroy()

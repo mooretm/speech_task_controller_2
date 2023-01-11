@@ -10,6 +10,7 @@
 from tkinter import messagebox
 
 # Import data science packages
+import numpy as np
 import pandas as pd
 
 # Import system packages
@@ -39,24 +40,29 @@ class StimulusList:
             in the proper order.
         """
         # Retrieve specified list number(s)
-        self._get_list_nums()
+        self._get_list_and_level_vals()
 
         try:
             # Load and subset sentences
             # Must occur before audio call
             self._get_sentences()
-            # Load and subset audio files
-            # Based on sentence call
+            # Load and subset audio files based on sentence df length
             self._get_audio_files()
+            # Create list of presentation levels based on sentence 
+            #   df length and sentences_per_list
+            self._get_levels()
         except FileNotFoundError:
             print("Models_Listmodel_52: Cannot find stimuli!")
 
 
-    def _get_list_nums(self):
-        """ Get list numbers as integers.
+    def _get_list_and_level_vals(self):
+        """ Get list and level values, convert to lists
         """
         self.lists = self.sessionpars['List Number'].get().split()
         self.lists = [int(val) for val in self.lists]
+
+        self.levels = self.sessionpars['Presentation Level'].get().split()
+        self.levels = [float(val) for val in self.levels]
 
 
     #############
@@ -70,11 +76,6 @@ class StimulusList:
         print("Models_listmodel_66: Checking for sentences dir...")
         if not os.path.exists(self.sessionpars['Sentence File Path'].get()):
             print("Models_listmodel_68: Not a valid 'sentences' file directory!")
-            #messagebox.showerror(
-            #    title='Directory Not Found!',
-            #    message="Cannot find the 'sentence' file directory!\n" + 
-            #    "Please choose another file path."
-            #)
             raise FileNotFoundError
 
         # If a valid directory has been given, 
@@ -85,10 +86,11 @@ class StimulusList:
         if len(sentence_file) > 1:
             messagebox.showwarning(
                 title="Too Many Files!",
-                message="Multiple sentence files found - taking the first one."
+                message="Multiple sentence files found - grabbing one at random."
             )
         # Read sentence file into dataframe
         s = pd.read_csv(sentence_file[0])
+        s = s.groupby('list_num').head(self.sessionpars['sentences_per_list'].get()).reset_index(drop=True)
 
         # Get sentences for specified list numbers
         self.sentence_df = s.loc[s['list_num'].isin(self.lists)].reset_index()
@@ -129,3 +131,16 @@ class StimulusList:
         self.audio_df = self.audio_df.loc[self.audio_df['file_num'].isin(self.sentence_df['sentence_num'])]
         print(self.audio_df)
         print("Models_listmodel_126: Audio list dataframe loaded into listmodel")
+
+
+    ##########
+    # Levels #
+    ##########
+    def _get_levels(self):
+        if len(self.levels) == 1:
+            self.all_levels = np.repeat(self.levels, self.sentence_df.shape[0])
+        else:
+            # create enough levels for each list
+            self.all_levels = np.repeat(self.levels, self.sessionpars['sentences_per_list'].get())
+        print(f"\nPresentation levels: {self.all_levels}")
+        print("Models_listmodel_145: Created list of presentation levels")

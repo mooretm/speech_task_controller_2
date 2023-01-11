@@ -150,19 +150,17 @@ class MainFrame(ttk.Frame):
             command=self._on_wrong)
         self.btn_wrong.grid(column=5, row=20, pady=(0,10))
 
-        # "Right" step size entry
-        #self.right_var = tk.DoubleVar()
-        self.right_var = tk.StringVar()
-        ent_right = ttk.Entry(frm_main, textvariable=self.right_var, 
-            width=5, takefocus=0)
-        ent_right.grid(column=6, row=15, sticky='w', pady=(0,10))
+        # # "Right" step size entry
+        # self.right_var = tk.StringVar()
+        # ent_right = ttk.Entry(frm_main, textvariable=self.right_var, 
+        #     width=5, takefocus=0)
+        # ent_right.grid(column=6, row=15, sticky='w', pady=(0,10))
 
-        # "Wrong" step size entry
-        #self.wrong_var = tk.DoubleVar()
-        self.wrong_var = tk.StringVar()
-        ent_wrong = ttk.Entry(frm_main, textvariable=self.wrong_var, 
-            width=5, takefocus=0)
-        ent_wrong.grid(column=6, row=20, sticky='w', pady=(0,10))
+        # # "Wrong" step size entry
+        # self.wrong_var = tk.StringVar()
+        # ent_wrong = ttk.Entry(frm_main, textvariable=self.wrong_var, 
+        #     width=5, takefocus=0)
+        # ent_wrong.grid(column=6, row=20, sticky='w', pady=(0,10))
 
         # Level step size label
         ttk.Label(frm_main, text='Step (dB)').grid(column=6, row=10, 
