@@ -12,6 +12,7 @@ from tkinter import messagebox
 # Import data science packages
 import numpy as np
 import pandas as pd
+import random
 
 # Import system packages
 import os
@@ -51,6 +52,8 @@ class StimulusList:
             # Create list of presentation levels based on sentence 
             #   df length and sentences_per_list
             self._get_levels()
+            # Create master df of sentences, audio and levels
+            self._make_master_df()
         except FileNotFoundError:
             print("Models_Listmodel_52: Cannot find stimuli!")
 
@@ -73,7 +76,7 @@ class StimulusList:
             Subset by specified list number(s) from session info.
         """
         # Check whether sentence directory exists
-        print("Models_listmodel_66: Checking for sentences dir...")
+        print("\nModels_listmodel_66: Checking for sentences dir...")
         if not os.path.exists(self.sessionpars['Sentence File Path'].get()):
             print("Models_listmodel_68: Not a valid 'sentences' file directory!")
             raise FileNotFoundError
@@ -94,7 +97,7 @@ class StimulusList:
 
         # Get sentences for specified list numbers
         self.sentence_df = s.loc[s['list_num'].isin(self.lists)].reset_index()
-        print(self.sentence_df)
+        #print(self.sentence_df)
         print("Models_listmodel_91: Sentence list dataframe loaded into listmodel")
 
 
@@ -106,7 +109,7 @@ class StimulusList:
             on sentences data frame.
         """
         # Check whether audio directory exists
-        print("Models_listmodel_102: Checking for audio files dir...")
+        print("\nModels_listmodel_102: Checking for audio files dir...")
         if not os.path.exists(self.sessionpars['Audio Files Path'].get()):
             print("Models_listmodel_104: Not a valid audio files directory!")
             messagebox.showerror(
@@ -129,7 +132,7 @@ class StimulusList:
 
         # Subset based on sentence dataframe values
         self.audio_df = self.audio_df.loc[self.audio_df['file_num'].isin(self.sentence_df['sentence_num'])]
-        print(self.audio_df)
+        #print(self.audio_df)
         print("Models_listmodel_126: Audio list dataframe loaded into listmodel")
 
 
@@ -142,5 +145,25 @@ class StimulusList:
         else:
             # create enough levels for each list
             self.all_levels = np.repeat(self.levels, self.sessionpars['sentences_per_list'].get())
-        print(f"\nPresentation levels: {self.all_levels}")
-        print("Models_listmodel_145: Created list of presentation levels")
+        #print(f"\nPresentation levels: {self.all_levels}")
+        print("\nModels_listmodel: Created list of presentation levels")
+
+
+    ####################
+    # Create Master DF #
+    ####################
+    def _make_master_df(self):
+        self.stim_master = self.sentence_df.copy()
+        self.stim_master.drop('index', axis=1, inplace=True)
+        self.stim_master['audio'] = list(self.audio_df['path'])
+        self.stim_master['level'] = self.all_levels
+        
+        # Reorder df column order
+        self.stim_master = self.stim_master[list((
+            'list_num', 'sentence_num', 'level', 'sentence', 'audio'
+        ))]
+
+        # Convert str to float
+        self.stim_master.level.astype(float)
+        print("\nModels_listmodel: Created master stimulus dataframe")
+        print(self.stim_master)

@@ -23,7 +23,8 @@ class ScoreModel:
 
 
     def set(self, key, value):
-        """ Set a variable value """
+        """ Set a variable value. 
+        """
         print("Models_Score_29: Setting scoremodel " +
             "fields with running vals...")
         if (

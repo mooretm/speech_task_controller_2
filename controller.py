@@ -69,8 +69,10 @@ class Application(tk.Tk):
         self.tracker = {
             'Level': [], # Adjusted presentation levels
             'PC Word': [], # Number of words correct
-            'PC Custom': [], # Outcomes (right/wrong; 1/0)
+            #'PC Custom': [], # Outcomes (right/wrong; 1/0)
         }
+
+        self.main_started = 0
 
 
         ######################################
@@ -85,6 +87,7 @@ class Application(tk.Tk):
 
         # Create and load list model
         self.listmodel = m_list.StimulusList(self.sessionpars)
+        # Maybe don't even try loading listmodel here due to randomization?
         try:
             self.listmodel.load()
         except FileNotFoundError:
@@ -224,7 +227,7 @@ class Application(tk.Tk):
         # Track values for summary at end
         self.tracker['Level'].append(self.sessionpars['new_db_lvl'].get())
         self.tracker['PC Word'].append(self.scoremodel.fields['Num Words Correct'])
-        self.tracker['PC Custom'].append(self.scoremodel.fields['Outcome'])
+        #self.tracker['PC Custom'].append(self.scoremodel.fields['Outcome'])
 
         # Call save function
         self._main_save()
@@ -267,16 +270,15 @@ class Application(tk.Tk):
         #print(f"Total words correct: {np.sum(self.tracker['PC Word'])}")
         mean_lvl = round(np.mean(self.tracker['Level']), 2)
         print(f"Tracker list of levels: {self.tracker['Level']}")
-        pc_word = round((np.sum(self.tracker['PC Word']) / (len(self.tracker['PC Custom'] * num_possible_words))) * 100, 2)
-        pc_custom = round((np.sum(self.tracker['PC Custom']) / len(self.tracker['PC Custom'])) * 100, 2)
+        #pc_word = round((np.sum(self.tracker['PC Word']) / (len(self.tracker['PC Custom'] * num_possible_words))) * 100, 2)
+        #pc_custom = round((np.sum(self.tracker['PC Custom']) / len(self.tracker['PC Custom'])) * 100, 2)
 
         # Summary stats messagebox
         messagebox.showinfo(
             title='Done!',
             message='Summary',
-            detail=f'Mean Level: {mean_lvl} dB\n' +
-                f'Percent Correct (Word): {pc_word}%\n' +
-                f'Percent Correct (Custom): {pc_custom}%'
+            #detail=f'Percent Correct: {pc_word}%' 
+            detail='[Insert score here]'   
         )
 
         # Close app when done
@@ -290,7 +292,7 @@ class Application(tk.Tk):
         """ Show session parameter dialog
         """
         print("\nApp_240: Calling session dialog...")
-        v_sess.SessionDialog(self, self.sessionpars, self.sessionpars_model)
+        v_sess.SessionDialog(self, self.sessionpars, self.sessionpars_model, self.listmodel)
 
 
     def _load_sessionpars(self):
@@ -322,9 +324,10 @@ class Application(tk.Tk):
             self.sessionpars_model.save()
 
         # Update session info labels
-        self.listmodel.load()
-        self.main_frame._load_listmodel()
-        self.main_frame._update_labels()
+        # DO NOT DO THIS ANYMORE! It will randomize the list each time!
+        #self.listmodel.load()
+        #self.main_frame._load_listmodel()
+        #self.main_frame._update_labels()
 
 
     ##########################

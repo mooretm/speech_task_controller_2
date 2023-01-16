@@ -13,6 +13,7 @@ from tkinter import messagebox
 
 # Import data science packages
 import numpy as np
+import random
 
 # Import text packages
 import string # for creating alphabet list
@@ -35,18 +36,6 @@ class MainFrame(ttk.Frame):
         self.listmodel = listmodel
         self.counter = 0
         self.outcome = None
-
-
-
-        ############ 
-        # Move this logic to wherever randomization occurs
-        ############
-        if self.sessionpars['randomize'].get() == 1:
-            print('\nViews_Main: Randomize = True')
-        else:
-             print('\nViews_Main: Randomize = False')
-
-
 
         # Set widget display options
         self.myFont = tk.font.nametofont('TkDefaultFont').configure(size=10)
@@ -126,7 +115,7 @@ class MainFrame(ttk.Frame):
         # "Start" button
         self.btn_start = ttk.Button(frm_main, text='Start',
             command=self._on_start, style='Start.TButton')
-        self.btn_start.grid(column=7, row=15, rowspan=6, 
+        self.btn_start.grid(column=6, row=15, #rowspan=6, 
             sticky='nsew', pady=(0,10))
 
         # "Repeat" button
@@ -140,15 +129,15 @@ class MainFrame(ttk.Frame):
             state='disabled', command=self._on_select_all, takefocus=0)
         self.btn_select_all.grid(column=5, row=8, pady=(0,10))
 
-        # "Right" button
-        self.btn_right = ttk.Button(frm_main, text='Right', state='disabled', 
-            command=self._on_right)
-        self.btn_right.grid(column=5, row=15, pady=(0,10))
+        # "Next" button
+        self.btn_next = ttk.Button(frm_main, text='Next', state='disabled', 
+            command=self._on_next)
+        self.btn_next.grid(column=5, row=15, pady=(0,10))
 
         # "Wrong" button
-        self.btn_wrong = ttk.Button(frm_main, text='Wrong', state='disabled',
-            command=self._on_wrong)
-        self.btn_wrong.grid(column=5, row=20, pady=(0,10))
+        #self.btn_wrong = ttk.Button(frm_main, text='Wrong', state='disabled',
+        #    command=self._on_wrong)
+        #self.btn_wrong.grid(column=5, row=20, pady=(0,10))
 
         # # "Right" step size entry
         # self.right_var = tk.StringVar()
@@ -163,8 +152,8 @@ class MainFrame(ttk.Frame):
         # ent_wrong.grid(column=6, row=20, sticky='w', pady=(0,10))
 
         # Level step size label
-        ttk.Label(frm_main, text='Step (dB)').grid(column=6, row=10, 
-            sticky='w')
+        #ttk.Label(frm_main, text='Step (dB)').grid(column=6, row=10, 
+        #    sticky='w')
 
 
         ##########################
@@ -197,28 +186,27 @@ class MainFrame(ttk.Frame):
         # Check for stimuli #
         #####################
         # Load stimuli from listmodel
-        self._load_listmodel()
+        #self._load_listmodel()
 
 
     #####################
     # General functions #
     #####################
-    def _load_listmodel(self):
+    def _get_stimuli(self):
         """ Load in current stimulus lists from listmodel
         """
         try:
-            self.audio_df = self.listmodel.audio_df
-            self.sentence_df = self.listmodel.sentence_df
-            self.text_vars[0].set("Click the START button to begin.")
+            self.listmodel.load()
+            #self.audio_df = self.listmodel.audio_df
+            #self.sentence_df = self.listmodel.sentence_df
+            self.stim_master = self.listmodel.stim_master
+            #self.text_vars[0].set("Click the START button to begin.")
+            #print('Views_Main: \nStimulus master list:')
+            #print(self.stim_master)
         except AttributeError:
             print("Views_Main_178: Problem loading stimuli!")
-            #messagebox.showerror(title="Restart Required",
-            #    message="Go to File -> Session to provide valid paths " + 
-            #    "to stimuli\n " + "then close and restart the application.")
-            # Provide instructions to give path and restart in sentence label
             self._reset()
             self.text_vars[0].set("Stimuli not found!\nGo to File-->Session to provide stimulus paths.")
-
             # Open session dialog for user
             self.event_generate('<<FileSession>>')
 
@@ -226,13 +214,16 @@ class MainFrame(ttk.Frame):
     def _update_labels(self, *_):
         """ Update session info labels
         """
+        # NOTE: This is called from the controller
         try:
             self.subject_var.set(f"Subject: {self.sessionpars['Subject'].get()}")
             self.condition_var.set(f"Condition: {self.sessionpars['Condition'].get()}")
             self.speaker_var.set(f"Speaker: {self.sessionpars['Speaker Number'].get()}")
             self.list_var.set(f"List(s): {self.sessionpars['List Number'].get()}")
-            self.level_var.set(f"Level: {self.sessionpars['new_db_lvl'].get()}")
-            self.trial_var.set(f"Trial: {self.counter+1} of {len(self.sentence_df)}")
+            #self.level_var.set(f"Level: {str(self.sessionpars['new_db_lvl'].get())}")
+            self.level_var.set(f"Level: {self.stim_master.loc[self.counter, 'level']}")
+            #self.trial_var.set(f"Trial: {self.counter+1} of {len(self.sentence_df)}")
+            self.trial_var.set(f"Trial: {self.counter+1} of {len(self.stim_master)}")
         except AttributeError:
             print("Views_Main_189: Cannot calculate trials data: stimuli not yet loaded!")
 
@@ -243,16 +234,12 @@ class MainFrame(ttk.Frame):
     def _on_start(self):
         """ Display/present first trial
         """
-        # Check for step size values
-        if not self.right_var.get() or not self.wrong_var.get():
-            messagebox.showerror(title="Invalid Step Size",
-                message="Please enter right/wrong step sizes to continue!\n\n" +
-                    "Note: Enter zeros for a fixed presentation level.")
-            return
-
-        # Calculate new dB FS level from current 
-        # new_db_lvl value in sessionpars
-        self._get_level()
+        # # Check for step size values
+        # if not self.right_var.get() or not self.wrong_var.get():
+        #     messagebox.showerror(title="Invalid Step Size",
+        #         message="Please enter right/wrong step sizes to continue!\n\n" +
+        #             "Note: Enter zeros for a fixed presentation level.")
+        #     return
 
         # Send event to controller to disable session menu
         # once task has started
@@ -261,22 +248,37 @@ class MainFrame(ttk.Frame):
         # Clean up buttons
         self.btn_start.grid_remove()
         self.btn_select_all.config(state='enabled')
-        self.btn_right.config(state='enabled')
-        self.btn_wrong.config(state='enabled')
+        self.btn_next.config(state='enabled')
+        #self.btn_wrong.config(state='enabled')
         # Show REPEAT button
-        self.btn_repeat.grid(column=7, row=15, rowspan=6, 
+        self.btn_repeat.grid(column=7, row=15, #rowspan=6, 
         sticky='nsew', pady=(0,10))
 
         # Reset trial counter to 0
-        self.counter = 0
+        #self.counter = 0
 
         # Load stimulus lists again
         # Required if no stimuli were available on init
-        self._load_listmodel()
+        self._get_stimuli()
 
-        # Load starting level based on value specified in session dialog.
-        self.sessionpars['new_db_lvl'].set(
-            self.sessionpars['Presentation Level'].get())
+        if self.sessionpars['randomize'].get() == 1:
+            print('\nViews_Main: Randomize = True')
+            trials = list(self.stim_master.index)
+            random.shuffle(trials)
+            self.stim_master['order'] = trials
+            self.stim_master.sort_values(by='order', inplace=True)
+            self.stim_master.set_index('order', inplace=True)
+            print(self.stim_master)
+        else:
+            print('\nViews_Main: Randomize = False')
+
+        # OLD: Load starting level based on value specified in session dialog.
+        # This is now part of the _get_level func
+        # This now comes from stim_master list
+
+        # Calculate new dB FS level from current 
+        # new_db_lvl value in sessionpars
+        self._get_level()
 
         # Update session info labels after loading listmodel
         self._update_labels()
@@ -293,8 +295,6 @@ class MainFrame(ttk.Frame):
 
         for ii in self.keyword_chks:
             self.chk_vars[ii].set(1)
-        #for val in self.chk_vars:
-        #    val.set(1)
 
 
     def _on_repeat(self):
@@ -305,34 +305,34 @@ class MainFrame(ttk.Frame):
         self._play()
 
 
-    def _on_wrong(self):
-        """ Update outcome to incorrect. 
-            Call remaining task functions. 
-        """
-        # Set response outcome to incorrect (0)
-        # Based on "wrong" button click
-        self.outcome = 0
+    # def _on_wrong(self):
+    #     """ Update outcome to incorrect. 
+    #         Call remaining task functions. 
+    #     """
+    #     # Set response outcome to incorrect (0)
+    #     # Based on "wrong" button click
+    #     self.outcome = 0
 
-        # Call series of task functions (same as _on_right)
-        self._next()
+    #     # Call series of task functions (same as _on_right)
+    #     self._next()
 
 
-    def _on_right(self):
-        """ Update outcome to correct.
-            Call remaining task functions. 
-        """
-        # Set response outcome to correct (1)
-        # Based on "right" button click
-        self.outcome = 1
+    # def _on_right(self):
+    #     """ Update outcome to correct.
+    #         Call remaining task functions. 
+    #     """
+    #     # Set response outcome to correct (1)
+    #     # Based on "right" button click
+    #     self.outcome = 1
 
-        # Call series of task functions (same as _on_wrong)
-        self._next()
+    #     # Call series of task functions (same as _on_wrong)
+    #     self._next()
 
 
     ###########################
     # Task process controller #
     ###########################
-    def _next(self):
+    def _on_next(self):
         """ Control the order of operations after right/wrong 
             buttons have assigned response outcome.
         """
@@ -340,70 +340,60 @@ class MainFrame(ttk.Frame):
         self._score()
         # Reset word labels and checkbuttons
         self._reset()
-        # Set new level based on right/wrong step size
-        self._adjust_level()
+        
+        if self.counter >= len(self.stim_master)-1:
+            print("Out of sentences!")
+            self.text_vars[0].set("Done!")
+            self.trial_var.set(f"Trial {len(self.stim_master)} of " +
+                f"{len(self.stim_master)}")
+            self.btn_next.config(state='disabled')
+            #self.btn_wrong.config(state='disabled')
+            self.event_generate('<<MainDone>>')
+            return
+
+        # Update trial counter
+        # Call before _get_level
+        # Call before _update_labels
+        self.counter += 1
+        
         # Calculate raw value to achieve new level
         self._get_level()
-        # Update trial counter
-        self.counter += 1
+
         # Update trial label
-        self.trial_var.set(f"Trial: {self.counter+1} of {len(self.sentence_df)}")
+        self._update_labels()
+
         # Start next trial: display new word labels and checkbuttons
         self._display()
         self._play()
-
-
-    ###################
-    # Audio functions #
-    ###################
-    def _adjust_level(self):
-        """ Apply right/wrong step size to presentation level
-            based on response outcome.
-        """
-        if self.outcome == 1:
-            # Apply step size offset to presentation level
-            self.sessionpars['new_db_lvl'].set(
-                self.sessionpars['new_db_lvl'].get() - float(self.right_var.get())
-            )
-        elif self.outcome == 0:
-            # Apply step size offset to presentation level
-            self.sessionpars['new_db_lvl'].set(
-                self.sessionpars['new_db_lvl'].get() + float(self.wrong_var.get())
-            )
-        else:
-            messagebox.showerror(
-                title="Uh oh!",
-                message="Cannot calculate new level with invalid score!\n" + 
-                    "Aborting!\n\nError: Views_Main_294"
-            )
-            self.quit()
 
 
     def _get_level(self):
         """ Send event to controller to calculate new 
             raw level for the updated presentation level.
         """
+        # Load level based on stim_master list
+        self.sessionpars['new_db_lvl'].set(self.stim_master.loc[self.counter, 'level'])
+        #print(f"Views_Main: new_db_lvl: {self.sessionpars['new_db_lvl'].get()}")
+        #print(f"Views_Main: Data type new_db_lvl: {type(self.sessionpars['new_db_lvl'].get())}")
+        self._update_labels()
+
         self.event_generate('<<GetLevel>>')
 
 
     def _enable_btns(self):
-        """ Set right/wrong button state to ENABLED
-            Set right/wrong text to right/wrong
+        """ Enable NEXT button.
+            Set NEXT button text to "Next."
         """
-        self.btn_right.config(state='enabled')
-        self.btn_wrong.config(state='enabled')
-        self.btn_right.config(text="Right")
-        self.btn_wrong.config(text="Wrong")
+        self.btn_next.config(state='enabled')
+        self.btn_next.config(text="Next")
 
 
     def _disable_btns(self, btntext):
-        """ Set right/wrong button state to DISABLED
-            Set right/wrong text to: Presenting
+        """ Disable NEXT button.
+            Set NEXT button text to: "Presenting"
         """
-        self.btn_right.config(state='disabled')
-        self.btn_wrong.config(state='disabled')
-        self.btn_right.config(text=btntext)
-        self.btn_wrong.config(text=btntext)
+        self.btn_next.config(state='disabled')
+        self.btn_next.config(text=btntext)
 
 
     def _play(self):
@@ -413,7 +403,7 @@ class MainFrame(ttk.Frame):
             # Create audio object
             print(f"Views_Main_363: Raw level sent to audio object: " +
                 f"{self.sessionpars['new_raw_lvl'].get()}")
-            audio = a.Audio(self.audio_df.iloc[self.counter]['path'], 
+            audio = a.Audio(self.stim_master.loc[self.counter, 'audio'],
                 self.sessionpars['new_raw_lvl'].get())
 
             # Disable right/wrong buttons to prevent multiple clicks
@@ -464,11 +454,11 @@ class MainFrame(ttk.Frame):
             key word.
         """
         # Track indexes of key word checkboxes for 
-        # select all
+        # SELECT ALL button
         self.keyword_chks = []
         try:
             # Get next sentence and split into a list of words
-            self.words = self.sentence_df.loc[
+            self.words = self.stim_master.loc[
                 self.counter, 'sentence'].split()
             # Remove period from last word
             if self.words[-1][-1] == '.':
@@ -490,10 +480,10 @@ class MainFrame(ttk.Frame):
         except KeyError:
             print("Out of sentences!")
             self.text_vars[0].set("Done!")
-            self.trial_var.set(f"Trial {len(self.sentence_df)} of " +
-                f"{len(self.sentence_df)}")
-            self.btn_right.config(state='disabled')
-            self.btn_wrong.config(state='disabled')
+            self.trial_var.set(f"Trial {len(self.stim_master)} of " +
+                f"{len(self.stim_master)}")
+            self.btn_next.config(state='disabled')
+            #self.btn_wrong.config(state='disabled')
             self.event_generate('<<MainDone>>')
             return
 
@@ -529,7 +519,7 @@ class MainFrame(ttk.Frame):
             self.scoremodel.fields['Words Correct'].split())
         self.scoremodel.fields['Words Incorrect'] = ' '.join(incorrect)
         self.scoremodel.fields['Trial'] = self.counter + 1
-        self.scoremodel.fields['Outcome'] = self.outcome
+        #self.scoremodel.fields['Outcome'] = self.outcome
 
         # Send event to controller to write response to file
         self.event_generate('<<SubmitResponse>>')

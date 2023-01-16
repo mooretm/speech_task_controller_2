@@ -18,11 +18,12 @@ from tktooltip import ToolTip
 class SessionDialog(tk.Toplevel):
     """ Dialog for setting session parameters
     """
-    def __init__(self, parent, sessionpars, sessionmodel, *args, **kwargs):
+    def __init__(self, parent, sessionpars, sessionmodel, listmodel, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
         self.parent = parent
         self.sessionpars = sessionpars
         self.sessionmodel = sessionmodel
+        self.listmodel = listmodel
 
         # Window setup
         self.withdraw()
@@ -220,6 +221,11 @@ class SessionDialog(tk.Toplevel):
         # No longer need to set new_db_lvl here because it will be pulled 
         # from the list of levels from the listmodel
         #self.sessionpars['new_db_lvl'].set(self.sessionpars['Presentation Level'].get())
+
+        # Load listmodel
+        print("\nViews_Session: Attempting to load listmodel stimuli")
+        self.listmodel.load()
+        print("Success!")
 
         # Validate number of provided lists/levels
         list_lvl_num_chk = self._chk_lengths()

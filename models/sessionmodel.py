@@ -32,7 +32,7 @@ class SessionParsModel:
         'slm_cal_value': {'type': 'float', 'value': 65},
         'slm_offset': {'type': 'float', 'value': 95.0},
         'new_raw_lvl': {'type': 'float', 'value': -30},
-        'new_db_lvl': {'type': 'str', 'value': '65'},
+        'new_db_lvl': {'type': 'float', 'value': 65.0},
         'Calibration File': {'type': 'str', 'value': 'cal_stim.wav'}
     }
 
