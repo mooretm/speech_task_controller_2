@@ -1,17 +1,11 @@
 """ Model to store task scores
 """
 
-############
-# IMPORTS  #
-############
-
-
-
 #########
 # MODEL #
 #########
 class ScoreModel:
-    """ Pass runtime data from main frame to controller.
+    """ Pass runtime data from main view to controller
     """
     fields = {
         'Words Correct': {'type': 'str', 'value': ''},
@@ -23,9 +17,9 @@ class ScoreModel:
 
 
     def set(self, key, value):
-        """ Set a variable value. 
+        """ Set a variable value 
         """
-        print("Models_Score_29: Setting scoremodel " +
+        print("Models_Score: Setting scoremodel " +
             "fields with running vals...")
         if (
             key in self.fields and 

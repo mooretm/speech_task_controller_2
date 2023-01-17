@@ -12,7 +12,6 @@ from tkinter import messagebox
 # Import data science packages
 import numpy as np
 import pandas as pd
-import random
 
 # Import system packages
 import os

@@ -78,7 +78,7 @@ class SessionDialog(tk.Toplevel):
             ).grid(row=4, column=1, sticky='w')
 
         # Level
-        lbl_level = ttk.Label(frm_session, text="Level(s) (dB):")
+        lbl_level = ttk.Label(frm_session, text="Level(s):")
         lbl_level.grid(row=5, column=0, sticky='e', **options)
         ttk.Entry(frm_session, width=20, 
             textvariable=self.sessionpars['Presentation Level']
@@ -90,6 +90,13 @@ class SessionDialog(tk.Toplevel):
         ttk.Entry(frm_session, width=20, 
             textvariable=self.sessionpars['sentences_per_list']
             ).grid(row=6, column=1, sticky='w')
+
+        # Scoring criterion
+        lbl_criterion = ttk.Label(frm_session, text="Criterion:")
+        lbl_criterion.grid(row=7, column=0, sticky='e', **options)
+        ttk.Entry(frm_session, width=20, 
+            textvariable=self.sessionpars['score_criterion']
+            ).grid(row=7, column=1, sticky='w')
 
         # Randomize
         #self.random_var = tk.IntVar(value=self.sessionpars['randomize'])
@@ -140,13 +147,19 @@ class SessionDialog(tk.Toplevel):
 
         ToolTip(
             lbl_level,
-            msg="Enter each level separated by a space.",
+            msg="Enter each level in dB, separated by a space.",
             delay=0.5
         )
 
         ToolTip(
             lbl_ppl, 
             msg="Number of sentences to present for each list.",
+            delay=0.5
+        )
+
+        ToolTip(
+            lbl_criterion, 
+            msg="Minimum number of words to mark trial as correct.",
             delay=0.5
         )
 

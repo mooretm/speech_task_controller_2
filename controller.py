@@ -1,18 +1,18 @@
 """ Speech Task Controller is a flexible program for presenting speech
-    corpi (e.g., IEEE) and providing word-level and custom scoring ability.
+    corpi (e.g., IEEE) and providing custom scoring ability.
 
     Simply provide a master list of sentences (with the proper formatting)
     and an audio file directory (with properly-named files) for a given 
     speech corpus. Score using check boxes. Trial data are output as a 
     .csv file. 
 
-    Advanced features include specifying the number of sentence to use 
+    Advanced features include specifying the number of sentences to use 
     from each list, multiple presentation levels, and a randomization 
     function.
 
     Written by: Travis M. Moore
     Created: Jun 23, 2022
-    Last edited: Jan 10, 2022
+    Last edited: Jan 17, 2023
 """
 
 ###########
@@ -69,10 +69,8 @@ class Application(tk.Tk):
         self.tracker = {
             'Level': [], # Adjusted presentation levels
             'PC Word': [], # Number of words correct
-            #'PC Custom': [], # Outcomes (right/wrong; 1/0)
+            'Outcome': [], # Outcome (1/0; right/wrong)
         }
-
-        self.main_started = 0
 
 
         ######################################
@@ -105,7 +103,10 @@ class Application(tk.Tk):
         self.menu = menu_main.MainMenu(self)
         self.config(menu=self.menu)
 
-        # Create callback dictionary
+        
+        #######################
+        # Callback dictionary #
+        #######################
         event_callbacks = {
             # File menu
             '<<FileSession>>': lambda _: self._show_session_dialog(),
@@ -227,7 +228,7 @@ class Application(tk.Tk):
         # Track values for summary at end
         self.tracker['Level'].append(self.sessionpars['new_db_lvl'].get())
         self.tracker['PC Word'].append(self.scoremodel.fields['Num Words Correct'])
-        #self.tracker['PC Custom'].append(self.scoremodel.fields['Outcome'])
+        self.tracker['Outcome'].append(self.scoremodel.fields['Outcome'])
 
         # Call save function
         self._main_save()
@@ -265,20 +266,19 @@ class Application(tk.Tk):
         """ Calculate and display summary stats. Close app.
         """
         # Calculate some descriptive statistics for display
-        num_possible_words = len(self.scoremodel.fields['Words Correct'].split()) + len(self.scoremodel.fields['Words Incorrect'].split())
-        #print(f'Words per sentence: {num_possible_words}')
-        #print(f"Total words correct: {np.sum(self.tracker['PC Word'])}")
-        mean_lvl = round(np.mean(self.tracker['Level']), 2)
+        num_keywords = len(self.scoremodel.fields['Words Correct'].split()) \
+            + len(self.scoremodel.fields['Words Incorrect'].split())
+        print(f'Words per sentence: {num_keywords}')
+        print(f"Total words correct: {np.sum(self.tracker['PC Word'])}")
+        print(f"Total number of sentences: {len(self.tracker['Outcome'])}")
         print(f"Tracker list of levels: {self.tracker['Level']}")
-        #pc_word = round((np.sum(self.tracker['PC Word']) / (len(self.tracker['PC Custom'] * num_possible_words))) * 100, 2)
-        #pc_custom = round((np.sum(self.tracker['PC Custom']) / len(self.tracker['PC Custom'])) * 100, 2)
-
+        pc_word = round((np.sum(self.tracker['PC Word']) / (len(self.tracker['Outcome'] * num_keywords))) * 100, 2)
+       
         # Summary stats messagebox
         messagebox.showinfo(
             title='Done!',
             message='Summary',
-            #detail=f'Percent Correct: {pc_word}%' 
-            detail='[Insert score here]'   
+            detail=f'Percent Correct: {pc_word}%'
         )
 
         # Close app when done
@@ -322,12 +322,6 @@ class Application(tk.Tk):
         for key, variable in self.sessionpars.items():
             self.sessionpars_model.set(key, variable.get())
             self.sessionpars_model.save()
-
-        # Update session info labels
-        # DO NOT DO THIS ANYMORE! It will randomize the list each time!
-        #self.listmodel.load()
-        #self.main_frame._load_listmodel()
-        #self.main_frame._update_labels()
 
 
     ##########################

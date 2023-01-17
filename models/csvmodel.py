@@ -4,9 +4,6 @@
 ############
 # IMPORTS  #
 ############
-import tkinter
-from tkinter import messagebox
-
 # Import system packages
 import csv
 from pathlib import Path
@@ -31,7 +28,7 @@ class CSVModel:
         """ Save a dictionary of data to .csv file 
         """
         # Create file name and path
-        filename = f"{self.datestamp}_{self.sessionpars['Condition'].get()}_{self.sessionpars['Subject'].get()}.csv"
+        filename = f"{self.sessionpars['Subject'].get()}_{self.sessionpars['Condition'].get()}_{self.datestamp}_.csv"
         self.file = Path(filename)
 
         # Check for write access to store csv

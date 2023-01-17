@@ -23,6 +23,7 @@ class SessionParsModel:
         'List Number': {'type': 'str', 'value': '1'},
         'Presentation Level': {'type': 'str', 'value': '65'},
         'sentences_per_list': {'type': 'int', 'value': 10},
+        'score_criterion': {'type': 'int', 'value': 5},
         'randomize': {'type': 'int', 'value': 0},
         'Speaker Number': {'type': 'int', 'value': 1},
         'Audio Files Path': {'type': 'str', 'value': 'Please select a path'},
@@ -81,7 +82,8 @@ class SessionParsModel:
 
 
     def set(self, key, value):
-        """ Set a variable value """
+        """ Set a variable value 
+        """
         print("Models_Session_85: Setting sessionpars model " +
             "fields with running vals...")
         if (
