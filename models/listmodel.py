@@ -166,3 +166,5 @@ class StimulusList:
         self.stim_master.level.astype(float)
         print("\nModels_listmodel: Created master stimulus dataframe")
         print(self.stim_master)
+
+

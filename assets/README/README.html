@@ -1,9 +1,9 @@
-<h1><strong>Speech Task Controller</strong></h1>
-<p>Graphical user interface (GUI) for presenting and scoring speech tasks.</p>
+<h1><strong>Speech Task Controller: MOCS</strong></h1>
+<p>Graphical user interface (GUI) for presenting and scoring speech tasks using the method of constant stimuli.</p>
 <ul>
 <li>Written by: <strong>Travis M. Moore</strong></li>
-<li>Latest version: <strong>Version 2.1.2</strong></li>
-<li>Last edited: <strong>December 07, 2022</strong>
+<li>Latest version: <strong>Version 0.0.1 BETA</strong></li>
+<li>Last edited: <strong>January 17, 2023</strong>
 <br>
 <br></li>
 </ul>
@@ -12,8 +12,7 @@
 <ul>
 <li>
 <p>This GUI was developed to provide an easy method for presenting speech tasks
-at various presentation levels, including adaptive changes in presentation 
-level, without having to recalibrate each time the level changes. </p>
+using multiple presentation levels, without having to recalibrate each time the level changes. </p>
 </li>
 <li>
 <p>This GUI also offers point-and-click scoring and provides session 
@@ -58,7 +57,13 @@ well as enter session information </li>
 <li>Subject: The participant ID number. Can be alphanumeric. </li>
 <li>Condition: A custom name for the current condition. Use underscores to add additional descriptors. For example: <code>quiet_highpass_unaided</code>.</li>
 <li>List(s): Specify the list you would like to present from the speech test/corpus. Enter additional list numbers separated by spaces to present multiple lists. For example: <code>1 2 5</code>. Lists do not have to be in sequential order. </li>
-<li>Level (dB): Enter the desired presentation level, using up to one decimal place For example: <code>65.5</code>.</li>
+<li>Level(s): Enter the desired presentation level, using up to one decimal place. For example: <code>65.5</code>. Add additional presentation levels separated by a space. NOTE: Enter a single presentation level to be used with multiple lists, or provide an equal number of lists and levels. </li>
+<li>Stim/List: The number of sentences to be used from each list. This is useful if you want to do a truncated run for practice. </li>
+<li>Criterion: The minimum number of keywords that must be correctly identified in order to mark the trial correct.</li>
+</ul>
+<h3>Options</h3>
+<ul>
+<li>Randomize: Select this option if you would like to present randomly across lists/levels. NOTE: Each list is assigned a consistent level (to keep the level same for each sentence from a given list). Randomization simply pulls a sentence from any available list, where lists may be assigned different levels (if provided). </li>
 </ul>
 <h3>Stimulus Directories</h3>
 <p>Provide the Speech Task Controller with the file paths to your stimuli. </p>
@@ -88,7 +93,7 @@ there should be 500 .wav files in the audio directory. </li>
 NOTE: <em>sentence_num values must correspond to the audio file names!</em></li>
 </ol>
 </li>
-<li>Any key words must be CAPITALIZED. The Speech Task Controller identifies key words based on capitalization.</li>
+<li>Any key words must be CAPITALIZED in the list of sentences: the Speech Task Controller identifies key words based on capitalization.</li>
 </ul>
 <!-- ![Sentence List Format image](./assets/images/sentence_list.png "Sentence List Format")
 <img src="./assets/images/sentence_list.png" alt="Sentence List image" width="600"/> -->
@@ -137,49 +142,57 @@ from the "device_id" column into the "Audio Device ID" text entry box. </li>
 <br>
 <br></p>
 <hr />
-<h2>Fixed and Adaptive Presentation Levels</h2>
-<p>The Speech Task Controller can present audio at a fixed level, or can change 
-the level adaptively. For a fixed presentation level, simply enter a value 
-of 0 in each text entry box labeled <strong>Step (dB)</strong> on the main screen (see red 
-rectangle in the image below). </p>
-<p>To change the level adaptively, enter non-zero values in the text entry boxes. The value given for the RIGHT button will <em>decrease</em> the level by that amount. The value given for the WRONG button will <em>increase</em> the level by that amount.<br>
-Note: Step sizes are in decibels.</p>
-<!-- <img src="./assets/images/step_size.png" alt="Step Size image" width="600"/> -->
-<p><img src="step_size.png" alt="Step Size image" width="600"/>
+<h2>Presentation Levels</h2>
+<p>The Speech Task Controller can present audio at a single or multiple levels, depending on the number of lists. </p>
+<h3>Presenting at a Single Level</h3>
+<ul>
+<li>To present a single list at a single level, simply enter one list number and one level. </li>
+<li>To present multiple lists at a single level, simply enter multiple list numbers and a single level</li>
+</ul>
+<h3>Presenting at Multiple Levels</h3>
+<ul>
+<li>You cannot present a single list at multiple levels</li>
+<li>To present at multiple levels, you must provide an equal number of lists and levels</li>
+<li>To present several lists at the same level, and several lists at a different level, simply add another instance of that level. For example: to present lists 1 and 2 at 60 dB and lists 3 and 4 at 70 dB, enter <code>1 2 3 4</code> in the <strong>List(s)</strong> textbox, and <code>60 60 70 70</code> in the <strong>Level(s)</strong> textbox.
 <br>
-<br></p>
+<br></li>
+</ul>
 <hr />
 <h2>Scoring</h2>
 <p>Sentences will be presented one-by-one from the list(s) entered in the Session window. The sentence text will be displayed in the "Sentence" section of the main screen. Check boxes will appear beneath each key word in the sentence. Click the check box if the participant correctly identified the word, otherwise leave the checkbox blank.</p>
 <p>As a convenience, you can click the SELECT ALL button to select every checkbox automatically. </p>
 <p>If you need to repeat the audio presentation of the current sentence, you can click the REPEAT button to present the audio again, without scoring or increasing the trial number. </p>
-<!-- <img src="./assets/images/scoring.png" alt="Scoring image" width="600"/> -->
+<p>After selecting the appropriate check boxes, click the NEXT button to record the current trial and begin the next trial.</p>
 <p><img src="scoring.png" alt="Scoring image" width="600"/></p>
-<p>After selecting the appropriate check boxes, click either the RIGHT or WRONG button. You are free to click whichever button you wish without defining any special scoring criteria. A running count of each time the RIGHT and WRONG buttons is pressed is kept and recorded for scoring. This record is displayed as the percent correct in a message box once the task has finished, labeled as <strong>Percent Correct (Custom)</strong>.</p>
-<p>In addition to scoring based on the number of right/wrong responses, the Speech Task Controller also tracks the percent correct based on the overall number of key words. This score is also provided in the message box at the end of the task, labeled <strong>Percent Correct (Word)</strong>.</p>
-<p>Finally, the mean level is also displayed at the end of the task in the message box, labeled as <strong>Mean Level</strong>. </p>
+<h3>Sentence-Level Scoring</h3>
+<p>Scoring occurs automatically based on the criterion you entered in the Session window (e.g., a minimum of 3 keywords must be correctly identified in order to score the trial as correct). This information is stored per trial in the "Outcome" column of the output .csv file. </p>
+<h3>Word-Level Scoring</h3>
+<p>The Speech Task Controller also tracks the percent correct based on the overall number of correctly identified keywords. For convenience, this score is provided in a message box at the end of the task labeled <strong>Percent Correct (Total Words)</strong>. Word-level data are also stored on a per trial basis in the output .csv file (see the <strong>Data Output</strong> section for more details). </p>
 <!-- <img src="./assets/images/summary.png" alt="Summary image" width="300"/> -->
 <p><img src="summary.png" alt="Summary image" width="300"/>
 <br>
 <br></p>
 <hr />
 <h2>Data Output</h2>
-<p>Each time you click the RIGHT or WRONG button, session data are written as a new line to the data .csv file. This file serves as a record of the session and can be used to calculate scores for later analysis. The file appears in the same directory as the Speech Task Controller app, with a naming convention of: <code>year_month_day_time_condition_subject.csv</code>. This ensures previous records are not overridden, even if you need to repeat the same condition. </p>
+<p>Each time you click the NEXT button, session data are written as a new line to the data .csv file. This file serves as a record of the session and can be used to calculate scores for later analysis. The file appears in the same directory as the Speech Task Controller app, with a naming convention of: <code>subject_condition_year_month_day_time.csv</code>. This ensures previous records are not overridden, even if you need to repeat the same condition. </p>
 <p>The data .csv file stores the following information on each trial: </p>
 <ul>
 <li>Subject: taken from the Session window</li>
 <li>Condition: taken from the Session window</li>
-<li>List Number: taken from the Session window</li>
-<li>Presentation Level: the starting level, taken from the Session window</li>
+<li>List Number: all lists entered in the Session window</li>
+<li>Presentation Level: all levels entered in the Session window</li>
+<li>sentences_per_list: the number of sentences to present from each list. Taken from the Session window</li>
+<li>score_criterion: the minimum number of keywords identified correctly to score the trial as correct. Taken from the Session window.</li>
+<li>randomize: either a 1 (randomized)</li>
 <li>raw_lvl: hard-coded starting level in dB FS</li>
 <li>slm_cal_val: the SLM value entered in the Calibration window</li>
 <li>slm_offset: calculated as <code>SLM Calibration Value - Raw Level</code></li>
-<li>new_db_lvl: calculated on each trial using values in the "Step (dB)" text entry boxes on the main screen</li>
 <li>new_raw_lvl: calculated as <code>new_db_lvl - slm_offset</code></li>
+<li>new_db_lvl: calculated on each trial using values in the "Step (dB)" text entry boxes on the main screen</li>
 <li>Words Correct: a space-separated list of the words marked correct</li>
 <li>Num Words Correct: the number of words marked correct</li>
 <li>Words Incorrect: a space-separated list of the words marked incorrect</li>
-<li>Outcome: a <code>1</code> or <code>0</code> based on whether the RIGHT or WRONG button was clicked, respectively</li>
+<li>Outcome: a <code>1</code> or <code>0</code> (right/wrong, respectively), based on whether the scoring criterion was met </li>
 <li>Trial: a counter starting at 1 and increasing with each presentation
 <br>
 <br></li>

@@ -1,4 +1,4 @@
-""" Speech Task Controller is a flexible program for presenting speech
+""" 'Speech Task Controller: MOCS' is a flexible program for presenting speech
     corpi (e.g., IEEE) and providing custom scoring ability.
 
     Simply provide a master list of sentences (with the proper formatting)
@@ -11,7 +11,7 @@
     function.
 
     Written by: Travis M. Moore
-    Created: Jun 23, 2022
+    Based on code created: Jun 23, 2022
     Last edited: Jan 17, 2023
 """
 
@@ -278,7 +278,7 @@ class Application(tk.Tk):
         messagebox.showinfo(
             title='Done!',
             message='Summary',
-            detail=f'Percent Correct: {pc_word}%'
+            detail=f'Percent Correct (Total Words): {pc_word}%'
         )
 
         # Close app when done

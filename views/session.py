@@ -30,27 +30,28 @@ class SessionDialog(tk.Toplevel):
         self.title("Session")
         self.grab_set()
 
-        # Shared display settings
-        options = {'padx':5, 'pady':5}
 
         #################
         # Create frames #
         #################
+        # Shared frame settings
+        options = {'padx':5, 'pady':5}
+
         # Session info frame
         frm_session = ttk.Labelframe(self, text='Session Information')
-        frm_session.grid(column=0, row=5, padx=10, pady=10, sticky='nsew')
+        frm_session.grid(row=5, column=0, padx=10, pady=10, sticky='nsew')
 
         # Session options frame
         frm_options = ttk.Labelframe(self, text='Options')
-        frm_options.grid(column=0, row=6, padx=10, pady=10, stick='nsew')
+        frm_options.grid(row=6, column=0, padx=10, pady=10, sticky='nsew')
 
         # Audio file browser frame
         frm_audiopath = ttk.Labelframe(self, text="Audio File Directory")
-        frm_audiopath.grid(column=0, row=10, padx=10, pady=10, ipadx=5, ipady=5)
+        frm_audiopath.grid(row=10, column=0, padx=10, pady=10, ipadx=5, ipady=5)
 
         # Sentence file browser frame
         frm_sentencepath = ttk.Labelframe(self, text='Sentence File Directory')
-        frm_sentencepath.grid(column=0, row=15, padx=10, pady=10, ipadx=5, ipady=5)
+        frm_sentencepath.grid(row=15, column=0, padx=10, pady=10, ipadx=5, ipady=5)
 
 
         #######################
@@ -235,15 +236,15 @@ class SessionDialog(tk.Toplevel):
         # from the list of levels from the listmodel
         #self.sessionpars['new_db_lvl'].set(self.sessionpars['Presentation Level'].get())
 
-        # Load listmodel
-        print("\nViews_Session: Attempting to load listmodel stimuli")
-        self.listmodel.load()
-        print("Success!")
-
         # Validate number of provided lists/levels
         list_lvl_num_chk = self._chk_lengths()
         if list_lvl_num_chk == 'invalid':
             return
+
+        # Load listmodel
+        print("\nViews_Session: Attempting to load listmodel stimuli")
+        self.listmodel.load()
+        print("Success!")
 
         print("\nViews_Session_140: Sending save event to controller...")
         self.parent.event_generate('<<SessionSubmit>>')
